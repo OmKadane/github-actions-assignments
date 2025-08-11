@@ -1,0 +1,44 @@
+name: 8. Integration Testing with Services
+
+on: [push]
+
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+    # Define a service container to run alongside the job
+    services:
+      postgres: # The label for the service
+        image: postgres:14.1 # The Docker image to use
+        env: # Set environment variables for the service
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432 # Map port from service to host runner (optional, but good for debugging)
+        options: >- # Health check to wait until the DB is ready
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          # Pass connection details to the test script via environment variables
+          DB_HOST: postgres # The service is reachable by its label name
+          DB_PORT: 5432 # The port inside the container network
+          DB_USER: testuser
+          DB_PASSWORD: testpassword
+          DB_NAME: testdb

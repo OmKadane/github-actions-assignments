@@ -1,0 +1,34 @@
+name: 2. Matrix Demo
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }} # Use the OS from the matrix
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node-version: [16, 18]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }} # Use the Node.js version from the matrix
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run Security Scan on Ubuntu 18 Only 🛡️
+        # This step only runs for the job where the OS is Ubuntu AND the Node version is 18
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 18
+        run: |
+          echo "Running security scan..."
+          # Replace this with your actual security command, e.g., npm audit
+          npm audit

@@ -1,0 +1,36 @@
+name: Reusable Test Workflow
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: 'The Node.js version to use'
+        required: true
+        type: number
+      run_lint:
+        description: 'Whether to run the linting step'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ inputs.node_version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node_version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Linter ✨
+        if: ${{ inputs.run_lint == true }} # Conditional step based on input
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test

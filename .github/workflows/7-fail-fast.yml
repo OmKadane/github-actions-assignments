@@ -1,0 +1,30 @@
+name: 7. Fail Fast Demo
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # Do not cancel other jobs if one fails
+      matrix:
+        node-version: [16, 18, 20]
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - run: npm test
+
+  report:
+    runs-on: ubuntu-latest
+    # This job runs even if the 'test' jobs fail
+    if: always()
+    needs: test # Depends on the entire matrix of 'test' jobs
+    steps:
+      - name: Generate report 📊
+        run: |
+          echo "Test matrix complete. Generating final report."
+          echo "Check the status of the 'test' jobs above to see individual results."

@@ -1,0 +1,8 @@
+{
+    "name": "my-github-actions",
+    "private": true,
+    "workspaces": [
+      "frontend",
+      "backend"
+    ]
+  }

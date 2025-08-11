@@ -1,0 +1,17 @@
+name: 5. Main Pipeline
+
+on: [push]
+
+jobs:
+  test-with-lint:
+    # Use the local reusable workflow
+    uses: ./.github/workflows/reusable-test.yml
+    with:
+      node_version: 16
+      run_lint: true # Pass inputs
+
+  test-without-lint:
+    uses: ./.github/workflows/reusable-test.yml
+    with:
+      node_version: 18
+      run_lint: false

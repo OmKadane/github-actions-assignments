@@ -1,0 +1,32 @@
+name: 4. Environments Demo
+
+on:
+  push:
+    branches: [ main ] # Auto-deploy to staging on push to main
+  workflow_dispatch: # Allow manual trigger for production
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment:
+      name: staging # Define the environment
+      url: https://staging.example.com # Optional: URL shows up in GitHub UI
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy to Staging
+        run: echo "Deploying to Staging environment..."
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: deploy-staging # Must run after staging is successful
+    environment:
+      name: production
+      url: https://app.example.com
+    # Only run this job if the workflow was triggered manually
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy to Production
+        run: echo "Deploying to Production environment..."
